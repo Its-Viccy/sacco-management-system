@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SACCO Loans</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-5">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Loan Management</h2>
+        <a href="{% url 'apply_loan' %}" class="btn btn-primary">+ Apply for Loan</a>
+    </div>
+
+    <div class="table-responsive bg-white rounded shadow-sm">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Loan #</th>
+                    <th>Member</th>
+                    <th>Principal</th>
+                    <th>Total Repayment</th>
+                    <th>Outstanding Balance</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for loan in loans %}
+                <tr>
+                    <td><code>{{ loan.loan_number }}</code></td>
+                    <td>{{ loan.member.first_name }} {{ loan.member.last_name }}</td>
+                    <td>KES {{ loan.principal_amount|floatformat:2 }}</td>
+                    <td>KES {{ loan.total_repayment|floatformat:2 }}</td>
+                    <td class="fw-bold text-danger">KES {{ loan.balance|floatformat:2 }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if loan.status == 'approved' or loan.status == 'disbursed' %}bg-success
+                            {% elif loan.status == 'pending' %}bg-warning text-dark
+                            {% elif loan.status == 'cleared' %}bg-info
+                            {% else %}bg-secondary{% endif %}">
+                            {{ loan.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{% url 'loan_detail' loan.id %}" class="btn btn-sm btn-outline-primary">View</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center text-muted py-4">No loan records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>
